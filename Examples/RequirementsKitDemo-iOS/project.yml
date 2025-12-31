@@ -1,0 +1,49 @@
+name: RequirementsKitDemo-iOS
+options:
+  bundleIdPrefix: com.requirementskit
+  deploymentTarget:
+    iOS: "17.0"
+  developmentLanguage: en
+  xcodeVersion: "16.0"
+  usesTabs: false
+  indentWidth: 2
+  tabWidth: 2
+
+packages:
+  RequirementsKit:
+    path: ../../
+    productTypes:
+      RequirementsKit: framework
+
+targets:
+  RequirementsKitDemo-iOS:
+    type: application
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - path: RequirementsKitDemo-iOS
+        excludes:
+          - "**/*.plist"
+    resources:
+      - path: RequirementsKitDemo-iOS/Assets.xcassets
+      - path: RequirementsKitDemo-iOS/Info.plist
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: com.requirementskit.demo
+      INFOPLIST_FILE: RequirementsKitDemo-iOS/Info.plist
+      SWIFT_VERSION: "6.0"
+      SWIFT_STRICT_CONCURRENCY: complete
+      ENABLE_PREVIEWS: YES
+    dependencies:
+      - package: RequirementsKit
+        product: RequirementsKit
+
+schemes:
+  RequirementsKitDemo-iOS:
+    build:
+      targets:
+        RequirementsKitDemo-iOS: all
+    run:
+      config: Debug
+    test:
+      config: Debug
+
