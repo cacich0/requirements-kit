@@ -38,6 +38,8 @@ let result = canTrade.evaluate(context)
 
 ### 🎯 Декларативный синтаксис
 - Макросы `#require`, `#all`, `#any`, `#not` для читаемого кода
+- Макросы валидации `#requireEmail`, `#requirePhone`, `#requireInRange` и др.
+- Attached макрос `@RequirementModel` для автоматической валидации
 - Fluent API с методами `.and()`, `.or()`, `.because()`
 - Логические операторы `&&`, `||`, `!`
 
@@ -71,6 +73,41 @@ let result = canTrade.evaluate(context)
 - Детальная трассировка проверки требований
 - Профилирование производительности
 - Middleware для логирования и аналитики
+
+### ✅ Валидация данных
+- **16 макросов** для валидации строк, коллекций, Optional, диапазонов
+- Макрос `@RequirementModel` для автоматической генерации валидации
+- Встроенные паттерны: email, phone, URL, UUID
+- Композиция валидационных атрибутов
+
+<details>
+<summary>Список всех валидационных макросов</summary>
+
+**Строки:**
+- `#requireEmail(\.field)` — валидация email
+- `#requirePhone(\.field)` — валидация телефона
+- `#requireURL(\.field)` — валидация URL
+- `#requireMinLength(\.field, n)` — минимальная длина
+- `#requireMaxLength(\.field, n)` — максимальная длина
+- `#requireLength(\.field, in: range)` — длина в диапазоне
+- `#requireNotBlank(\.field)` — не пустая строка
+- `#requireMatches(\.field, pattern:)` — regex проверка
+
+**Коллекции:**
+- `#requireNotEmpty(\.field)` — не пустая коллекция
+- `#requireEmpty(\.field)` — пустая коллекция
+- `#requireCount(\.field, min:max:)` — количество элементов
+
+**Optional:**
+- `#requireNonNil(\.field)` — значение не nil
+- `#requireNil(\.field)` — значение nil
+- `#requireSome(\.field, where:)` — Optional с предикатом
+
+**Диапазоны:**
+- `#requireInRange(\.field, range)` — значение в диапазоне
+- `#requireBetween(\.field, min:max:)` — значение между min и max
+
+</details>
 
 ### 🎨 Интеграция с UI
 - Property wrappers `@Eligible` и `@Eligibility`
@@ -132,6 +169,38 @@ case .confirmed:
 case .failed(let reason):
   print("❌ Отказано: \(reason.message)")
 }
+```
+
+#### Быстрый старт с макросами валидации
+
+Для простой валидации данных используйте макросы:
+
+```swift
+// Валидация email
+let emailValid: Requirement<FormContext> = #requireEmail(\.email)
+
+// Валидация с композицией
+let formValid: Requirement<FormContext> = #all {
+  #requireEmail(\.email)
+  #requireMinLength(\.username, 3)
+  #requireInRange(\.age, 18...120)
+}
+
+// Автоматическая валидация с @RequirementModel
+@RequirementModel
+struct User: Sendable {
+  @Email
+  var email: String
+  
+  @MinLength(3) @MaxLength(20)
+  var username: String
+  
+  @InRange(18...120)
+  var age: Int
+}
+
+let user = User(email: "user@example.com", username: "john", age: 25)
+let validation = user.validate() // Автоматически генерируется!
 ```
 
 #### 3. Добавьте описание причины
@@ -503,35 +572,329 @@ $tradePublisher.send(newContext)
 
 ### Валидация данных
 
-#### String валидация
+RequirementsKit предоставляет мощные макросы для валидации строк, коллекций, опциональных значений и диапазонов.
+
+#### Макросы валидации строк
+
+```swift
+struct FormContext: Sendable {
+  let email: String
+  let username: String
+  let password: String
+  let phone: String
+  let website: String
+}
+
+// Email валидация
+let emailValid: Requirement<FormContext> = #requireEmail(\.email)
+
+// Username с проверкой длины
+let usernameValid: Requirement<FormContext> = #all {
+  #requireMinLength(\.username, 3)
+  #requireMaxLength(\.username, 20)
+  #requireMatches(\.username, pattern: ValidationPattern.alphanumeric)
+}
+
+// Password с комплексной валидацией
+let passwordValid: Requirement<FormContext> = #all {
+  #requireLength(\.password, in: 8...128)
+  #requireMatches(\.password, pattern: ".*[0-9].*")     // содержит цифру
+  #requireMatches(\.password, pattern: ".*[A-Z].*")     // содержит заглавную букву
+  #requireMatches(\.password, pattern: ".*[a-z].*")     // содержит строчную букву
+}
+
+// Телефон в международном формате
+let phoneValid: Requirement<FormContext> = #requirePhone(\.phone)
+
+// URL валидация
+let websiteValid: Requirement<FormContext> = #requireURL(\.website)
+
+// Не пустая строка (после trim)
+let nameValid: Requirement<FormContext> = #requireNotBlank(\.name)
+```
+
+**Доступные макросы:**
+- `#requireEmail(\.field)` — валидация email
+- `#requirePhone(\.field)` — валидация телефона
+- `#requireURL(\.field)` — валидация URL
+- `#requireMinLength(\.field, 3)` — минимальная длина
+- `#requireMaxLength(\.field, 20)` — максимальная длина
+- `#requireLength(\.field, in: 8...20)` — длина в диапазоне
+- `#requireNotBlank(\.field)` — не пустая строка
+- `#requireMatches(\.field, pattern: "...")` — regex проверка
+
+#### Макросы валидации коллекций
+
+```swift
+struct OrderContext: Sendable {
+  let items: [String]
+  let errors: [String]
+}
+
+// Коллекция не пустая
+let hasItems: Requirement<OrderContext> = #requireNotEmpty(\.items)
+
+// Количество элементов в диапазоне
+let validItemCount: Requirement<OrderContext> = #requireCount(\.items, min: 1, max: 100)
+
+// Коллекция пустая (для проверки отсутствия ошибок)
+let noErrors: Requirement<OrderContext> = #requireEmpty(\.errors)
+
+// Комплексная валидация корзины
+let validCart: Requirement<OrderContext> = #all {
+  #requireNotEmpty(\.items)
+  #requireCount(\.items, min: 1, max: 50)
+  #requireEmpty(\.errors)
+}
+```
+
+#### Макросы для Optional значений
+
+```swift
+struct UserContext: Sendable {
+  let userId: String?
+  let age: Int?
+  let tempData: String?
+}
+
+// Значение должно быть не nil
+let userIdRequired: Requirement<UserContext> = #requireNonNil(\.userId)
+
+// Значение должно быть nil
+let noTempData: Requirement<UserContext> = #requireNil(\.tempData)
+
+// Optional с предикатом
+let adultUser: Requirement<UserContext> = #requireSome(\.age, where: { $0 >= 18 })
+
+// Комплексная проверка
+let validUser: Requirement<UserContext> = #all {
+  #requireNonNil(\.userId)
+  #requireSome(\.age, where: { $0 >= 18 })
+  #requireNil(\.tempData)
+}
+```
+
+#### Макросы для диапазонов
+
+```swift
+struct ProfileContext: Sendable {
+  let age: Int
+  let temperature: Double
+  let score: Int
+}
+
+// Возраст в диапазоне
+let validAge: Requirement<ProfileContext> = #requireInRange(\.age, 18...120)
+
+// Температура в диапазоне
+let validTemp: Requirement<ProfileContext> = #requireInRange(\.temperature, -40.0...50.0)
+
+// Score между min и max
+let validScore: Requirement<ProfileContext> = #requireBetween(\.score, min: 0, max: 100)
+```
+
+### @RequirementModel — Автоматическая валидация
+
+Используйте attached макрос `@RequirementModel` для автоматической генерации метода `validate()` на основе валидационных атрибутов:
+
+#### Базовый пример
 
 ```swift
 import RequirementsKit
 
-let emailValid = Requirement<String>
-  .notEmpty()
-  .matches(pattern: #"^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$"#, options: .caseInsensitive)
-  .because("Некорректный email")
+@RequirementModel
+struct User: Sendable {
+  @MinLength(3) @MaxLength(20)
+  var username: String
+  
+  @Email
+  var email: String
+  
+  @InRange(18...120)
+  var age: Int
+  
+  @Phone
+  var phoneNumber: String
+  
+  // Обычные свойства без валидации
+  var userId: String
+  var createdAt: Date
+}
 
-let email = "user@example.com"
-let result = emailValid.evaluate(email)
+// Использование
+let user = User(
+  username: "john",
+  email: "john@example.com",
+  age: 25,
+  phoneNumber: "+1234567890",
+  userId: "user123",
+  createdAt: Date()
+)
+
+let validation = user.validate()
+
+if validation.isConfirmed {
+  print("✅ Пользователь валиден")
+} else {
+  print("❌ Ошибки валидации:")
+  for failure in validation.allFailures {
+    print("  - \(failure.message)")
+  }
+}
 ```
 
-#### Collection валидация
+#### Доступные атрибуты
 
 ```swift
-let hasItems = Requirement<[Item]>
-  .notEmpty()
-  .count(min: 1, max: 100)
-  .because("Корзина должна содержать от 1 до 100 товаров")
+@RequirementModel
+struct RegistrationForm: Sendable {
+  // Строковые атрибуты
+  @MinLength(3) @MaxLength(20) @Matches(#"^[a-zA-Z0-9]+$"#)
+  var username: String
+  
+  @Email
+  var email: String
+  
+  @MinLength(8)
+  var password: String
+  
+  @Phone
+  var phoneNumber: String
+  
+  @URL
+  var website: String
+  
+  @NotBlank
+  var fullName: String
+  
+  // Числовые атрибуты
+  @InRange(18...120)
+  var age: Int
+  
+  @InRange(0.5...2.0)
+  var animationSpeed: Double
+  
+  // Коллекции
+  @NotEmpty
+  var interests: [String]
+  
+  // Optional
+  @NonNil
+  var userId: String?
+}
 ```
 
-#### Range валидация
+**Список атрибутов:**
+- `@MinLength(n)` — минимальная длина строки
+- `@MaxLength(n)` — максимальная длина строки
+- `@Email` — валидация email
+- `@Phone` — валидация телефона
+- `@URL` — валидация URL
+- `@NotBlank` — строка не пустая (после trim)
+- `@Matches(pattern)` — соответствие regex
+- `@InRange(range)` — значение в диапазоне
+- `@NotEmpty` — коллекция не пустая
+- `@NonNil` — optional не nil
+
+#### Реальный пример: Форма заказа
 
 ```swift
-let ageValid = Requirement<Int>
-  .inRange(18...120)
-  .because("Возраст должен быть от 18 до 120 лет")
+@RequirementModel
+struct OrderForm: Sendable {
+  @NotEmpty
+  var items: [String]
+  
+  @InRange(1.0...100000.0)
+  var totalAmount: Double
+  
+  @NotBlank
+  var shippingAddress: String
+  
+  @NotBlank
+  var billingAddress: String
+  
+  @Phone
+  var contactPhone: String
+  
+  @Email
+  var contactEmail: String
+  
+  // Обычные свойства
+  var orderId: String
+  var orderDate: Date
+}
+
+// Создание и валидация
+let order = OrderForm(
+  items: ["item1", "item2"],
+  totalAmount: 299.99,
+  shippingAddress: "123 Main St",
+  billingAddress: "123 Main St",
+  contactPhone: "+1234567890",
+  contactEmail: "customer@example.com",
+  orderId: "ORD-001",
+  orderDate: Date()
+)
+
+let validation = order.validate()
+
+// Обработка результата
+switch validation {
+case .confirmed:
+  processOrder(order)
+  
+case .failed:
+  showErrors(validation.allFailures)
+}
+```
+
+#### Композиция с другими требованиями
+
+`@RequirementModel` генерирует метод `validate()`, который можно комбинировать с другими требованиями:
+
+```swift
+@RequirementModel
+struct User: Sendable {
+  @Email
+  var email: String
+  
+  @MinLength(8)
+  var password: String
+}
+
+// Дополнительные бизнес-требования
+let additionalChecks: Requirement<User> = #all {
+  Requirement { context in
+    context.password != context.email
+      ? .confirmed
+      : .failed(reason: Reason(message: "Пароль не должен совпадать с email"))
+  }
+  
+  Requirement { context in
+    !commonPasswords.contains(context.password)
+      ? .confirmed
+      : .failed(reason: Reason(message: "Слишком простой пароль"))
+  }
+}
+
+// Полная валидация
+let user = User(email: "user@example.com", password: "SecurePass123")
+
+// Проверяем встроенную валидацию
+let basicValidation = user.validate()
+guard basicValidation.isConfirmed else {
+  print("Ошибки валидации формы")
+  return
+}
+
+// Проверяем дополнительные требования
+let additionalValidation = additionalChecks.evaluate(user)
+guard additionalValidation.isConfirmed else {
+  print("Ошибки бизнес-логики")
+  return
+}
+
+print("✅ Регистрация успешна")
 ```
 
 ### Получение всех причин отказа
@@ -801,7 +1164,9 @@ RequirementsKit создан для упрощения описания бизн
 ## Дополнительные ресурсы
 
 - [Документация API](Documentation.docc/)
+- [Справочник по макросам](Documentation.docc/MacroReference.md) 📝 **НОВОЕ**
 - [Примеры использования](Examples/)
+- [Демо-приложение iOS](Examples/RequirementsKitDemo-iOS/)
 
 ---
 
