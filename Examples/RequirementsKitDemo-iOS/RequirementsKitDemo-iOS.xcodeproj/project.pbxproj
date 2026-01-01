@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		151CD65C5929A824BEF1927F /* TradingDemoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BECAE86CE3BF7F6CE9DA5094 /* TradingDemoView.swift */; };
+		1AC93BFCE0647A206BD4D458 /* MacrosDemoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F75A48872BF279B0FC498B27 /* MacrosDemoView.swift */; };
 		37301D8DF1B8717ADDC1D63A /* AuthRequirements.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3C56084B1FAF0642591CA89 /* AuthRequirements.swift */; };
 		394604F4E8E94AF2F7CC7401 /* SubscriptionDemoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4408B6C9E735450BB7A52E14 /* SubscriptionDemoView.swift */; };
 		65582662DA560BBA3826DB4D /* SubscriptionRequirements.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDEEBF0306ED4F05FE2A884C /* SubscriptionRequirements.swift */; };
@@ -23,12 +24,14 @@
 		D596AEC62338EC8CB0006510 /* Product.swift in Sources */ = {isa = PBXBuildFile; fileRef = 966EBEBDD4845E860882801D /* Product.swift */; };
 		DA96B3B3FD1650DE80E8058E /* Order.swift in Sources */ = {isa = PBXBuildFile; fileRef = B70999DED0A601BD4231DC02 /* Order.swift */; };
 		E8002D03CDDAB8567EF25D80 /* AuthDemoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63E3911ED5EF35D425DFED93 /* AuthDemoView.swift */; };
+		F3DB5BC4E036FB3B753ECE95 /* ValidatedUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 416F26398A0640F3DCF86FCF /* ValidatedUser.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		10462E4444F1C2F8D7645B45 /* requirements-kit */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "requirements-kit"; path = ../..; sourceTree = SOURCE_ROOT; };
 		145A01A4BFFE8DE9527C899A /* ValidationDemoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValidationDemoView.swift; sourceTree = "<group>"; };
 		3E8892CAB93C284C7E16ABF4 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		416F26398A0640F3DCF86FCF /* ValidatedUser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValidatedUser.swift; sourceTree = "<group>"; };
 		41B1F524521A05507B72BCF0 /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
 		428FEDB76C238E6A4E6A52E9 /* ValidationRequirements.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValidationRequirements.swift; sourceTree = "<group>"; };
 		4408B6C9E735450BB7A52E14 /* SubscriptionDemoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionDemoView.swift; sourceTree = "<group>"; };
@@ -42,6 +45,7 @@
 		D3C56084B1FAF0642591CA89 /* AuthRequirements.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthRequirements.swift; sourceTree = "<group>"; };
 		F0C87F5B6A02B98D5BF29FCD /* MockServices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockServices.swift; sourceTree = "<group>"; };
 		F338705BA1EFFA1F8E671DF6 /* RequirementsKitDemo-iOS.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = "RequirementsKitDemo-iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		F75A48872BF279B0FC498B27 /* MacrosDemoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacrosDemoView.swift; sourceTree = "<group>"; };
 		FDEEBF0306ED4F05FE2A884C /* SubscriptionRequirements.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionRequirements.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -62,6 +66,7 @@
 			children = (
 				63E3911ED5EF35D425DFED93 /* AuthDemoView.swift */,
 				5369ED172BC79BC64BB415C8 /* ContentView.swift */,
+				F75A48872BF279B0FC498B27 /* MacrosDemoView.swift */,
 				4408B6C9E735450BB7A52E14 /* SubscriptionDemoView.swift */,
 				BECAE86CE3BF7F6CE9DA5094 /* TradingDemoView.swift */,
 				145A01A4BFFE8DE9527C899A /* ValidationDemoView.swift */,
@@ -83,6 +88,7 @@
 				B70999DED0A601BD4231DC02 /* Order.swift */,
 				966EBEBDD4845E860882801D /* Product.swift */,
 				A753677A5500969540174C93 /* User.swift */,
+				416F26398A0640F3DCF86FCF /* ValidatedUser.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -213,6 +219,7 @@
 				E8002D03CDDAB8567EF25D80 /* AuthDemoView.swift in Sources */,
 				37301D8DF1B8717ADDC1D63A /* AuthRequirements.swift in Sources */,
 				D22A2D8806C402AA7D67A5CA /* ContentView.swift in Sources */,
+				1AC93BFCE0647A206BD4D458 /* MacrosDemoView.swift in Sources */,
 				B784B248632F582F8905CBC0 /* MockServices.swift in Sources */,
 				DA96B3B3FD1650DE80E8058E /* Order.swift in Sources */,
 				D596AEC62338EC8CB0006510 /* Product.swift in Sources */,
@@ -221,6 +228,7 @@
 				151CD65C5929A824BEF1927F /* TradingDemoView.swift in Sources */,
 				7EED6234F3F04B056D1CEBDA /* TradingRequirements.swift in Sources */,
 				872AACC974EBFB689049285F /* User.swift in Sources */,
+				F3DB5BC4E036FB3B753ECE95 /* ValidatedUser.swift in Sources */,
 				BB0B0C7018B656DCF57E3FF2 /* ValidationDemoView.swift in Sources */,
 				797EB3BE7B6F63A88F6D06CF /* ValidationRequirements.swift in Sources */,
 			);

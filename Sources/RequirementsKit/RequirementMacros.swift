@@ -158,3 +158,220 @@ public macro requireOrElse<Context: Sendable>(
   @RequirementsBuilder<Context> _ fallback: () -> [Requirement<Context>]
 ) -> Requirement<Context> = #externalMacro(module: "RequirementsKitMacros", type: "RequireOrElseMacro")
 
+// MARK: - Макросы валидации строк
+
+/// Макрос для проверки строки на соответствие регулярному выражению
+///
+/// Использование:
+/// ```swift
+/// #requireMatches(\.email, pattern: ValidationPattern.email)
+/// ```
+@freestanding(expression)
+public macro requireMatches<Context: Sendable>(
+  _ keyPath: KeyPath<Context, String> & Sendable,
+  pattern: String
+) -> Requirement<Context> = #externalMacro(module: "RequirementsKitMacros", type: "RequireMatchesMacro")
+
+/// Макрос для проверки минимальной длины строки
+///
+/// Использование:
+/// ```swift
+/// #requireMinLength(\.username, 3)
+/// ```
+@freestanding(expression)
+public macro requireMinLength<Context: Sendable>(
+  _ keyPath: KeyPath<Context, String> & Sendable,
+  _ minLength: Int
+) -> Requirement<Context> = #externalMacro(module: "RequirementsKitMacros", type: "RequireMinLengthMacro")
+
+/// Макрос для проверки максимальной длины строки
+///
+/// Использование:
+/// ```swift
+/// #requireMaxLength(\.username, 20)
+/// ```
+@freestanding(expression)
+public macro requireMaxLength<Context: Sendable>(
+  _ keyPath: KeyPath<Context, String> & Sendable,
+  _ maxLength: Int
+) -> Requirement<Context> = #externalMacro(module: "RequirementsKitMacros", type: "RequireMaxLengthMacro")
+
+/// Макрос для проверки длины строки в диапазоне
+///
+/// Использование:
+/// ```swift
+/// #requireLength(\.password, in: 8...128)
+/// ```
+@freestanding(expression)
+public macro requireLength<Context: Sendable>(
+  _ keyPath: KeyPath<Context, String> & Sendable,
+  in range: ClosedRange<Int>
+) -> Requirement<Context> = #externalMacro(module: "RequirementsKitMacros", type: "RequireLengthMacro")
+
+/// Макрос для проверки, что строка не пустая (после trim)
+///
+/// Использование:
+/// ```swift
+/// #requireNotBlank(\.name)
+/// ```
+@freestanding(expression)
+public macro requireNotBlank<Context: Sendable>(
+  _ keyPath: KeyPath<Context, String> & Sendable
+) -> Requirement<Context> = #externalMacro(module: "RequirementsKitMacros", type: "RequireNotBlankMacro")
+
+/// Макрос для валидации email
+///
+/// Использование:
+/// ```swift
+/// #requireEmail(\.email)
+/// ```
+@freestanding(expression)
+public macro requireEmail<Context: Sendable>(
+  _ keyPath: KeyPath<Context, String> & Sendable
+) -> Requirement<Context> = #externalMacro(module: "RequirementsKitMacros", type: "RequireEmailMacro")
+
+/// Макрос для валидации URL
+///
+/// Использование:
+/// ```swift
+/// #requireURL(\.website)
+/// ```
+@freestanding(expression)
+public macro requireURL<Context: Sendable>(
+  _ keyPath: KeyPath<Context, String> & Sendable
+) -> Requirement<Context> = #externalMacro(module: "RequirementsKitMacros", type: "RequireURLMacro")
+
+/// Макрос для валидации телефона (международный формат)
+///
+/// Использование:
+/// ```swift
+/// #requirePhone(\.phoneNumber)
+/// ```
+@freestanding(expression)
+public macro requirePhone<Context: Sendable>(
+  _ keyPath: KeyPath<Context, String> & Sendable
+) -> Requirement<Context> = #externalMacro(module: "RequirementsKitMacros", type: "RequirePhoneMacro")
+
+// MARK: - Макросы валидации коллекций
+
+/// Макрос для проверки количества элементов в коллекции
+///
+/// Использование:
+/// ```swift
+/// #requireCount(\.items, min: 1, max: 50)
+/// ```
+@freestanding(expression)
+public macro requireCount<Context: Sendable, C: Collection & Sendable>(
+  _ keyPath: KeyPath<Context, C> & Sendable,
+  min: Int? = nil,
+  max: Int? = nil
+) -> Requirement<Context> = #externalMacro(module: "RequirementsKitMacros", type: "RequireCountMacro")
+
+/// Макрос для проверки, что коллекция не пустая
+///
+/// Использование:
+/// ```swift
+/// #requireNotEmpty(\.cart)
+/// ```
+@freestanding(expression)
+public macro requireNotEmpty<Context: Sendable, C: Collection & Sendable>(
+  _ keyPath: KeyPath<Context, C> & Sendable
+) -> Requirement<Context> = #externalMacro(module: "RequirementsKitMacros", type: "RequireNotEmptyMacro")
+
+/// Макрос для проверки, что коллекция пустая
+///
+/// Использование:
+/// ```swift
+/// #requireEmpty(\.errors)
+/// ```
+@freestanding(expression)
+public macro requireEmpty<Context: Sendable, C: Collection & Sendable>(
+  _ keyPath: KeyPath<Context, C> & Sendable
+) -> Requirement<Context> = #externalMacro(module: "RequirementsKitMacros", type: "RequireEmptyMacro")
+
+// MARK: - Макросы для Optional значений
+
+/// Макрос для проверки, что Optional значение не nil
+///
+/// Использование:
+/// ```swift
+/// #requireNonNil(\.userId)
+/// ```
+@freestanding(expression)
+public macro requireNonNil<Context: Sendable, Value: Sendable>(
+  _ keyPath: KeyPath<Context, Value?> & Sendable
+) -> Requirement<Context> = #externalMacro(module: "RequirementsKitMacros", type: "RequireNonNilMacro")
+
+/// Макрос для проверки, что Optional значение nil
+///
+/// Использование:
+/// ```swift
+/// #requireNil(\.tempData)
+/// ```
+@freestanding(expression)
+public macro requireNil<Context: Sendable, Value: Sendable>(
+  _ keyPath: KeyPath<Context, Value?> & Sendable
+) -> Requirement<Context> = #externalMacro(module: "RequirementsKitMacros", type: "RequireNilMacro")
+
+/// Макрос для проверки, что Optional содержит значение, удовлетворяющее условию
+///
+/// Использование:
+/// ```swift
+/// #requireSome(\.age, where: { $0 >= 18 })
+/// ```
+@freestanding(expression)
+public macro requireSome<Context: Sendable, Value: Sendable>(
+  _ keyPath: KeyPath<Context, Value?> & Sendable,
+  where predicate: @escaping @Sendable (Value) -> Bool
+) -> Requirement<Context> = #externalMacro(module: "RequirementsKitMacros", type: "RequireSomeMacro")
+
+// MARK: - Макросы для работы с диапазонами
+
+/// Макрос для проверки, что значение находится в диапазоне
+///
+/// Использование:
+/// ```swift
+/// #requireInRange(\.age, 18...120)
+/// ```
+@freestanding(expression)
+public macro requireInRange<Context: Sendable, Value: Comparable & Sendable>(
+  _ keyPath: KeyPath<Context, Value> & Sendable,
+  _ range: ClosedRange<Value>
+) -> Requirement<Context> = #externalMacro(module: "RequirementsKitMacros", type: "RequireInRangeMacro")
+
+/// Макрос для проверки, что значение находится между min и max
+///
+/// Использование:
+/// ```swift
+/// #requireBetween(\.amount, min: 10, max: 1000)
+/// ```
+@freestanding(expression)
+public macro requireBetween<Context: Sendable, Value: Comparable & Sendable>(
+  _ keyPath: KeyPath<Context, Value> & Sendable,
+  min: Value,
+  max: Value
+) -> Requirement<Context> = #externalMacro(module: "RequirementsKitMacros", type: "RequireBetweenMacro")
+
+// MARK: - Attached макрос @RequirementModel
+
+/// Attached макрос для автоматической генерации метода validate() на основе валидационных атрибутов
+///
+/// Использование:
+/// ```swift
+/// @RequirementModel
+/// struct User {
+///   @MinLength(3) @MaxLength(20)
+///   var username: String
+///
+///   @Email
+///   var email: String
+///
+///   @InRange(18...120)
+///   var age: Int
+/// }
+/// ```
+///
+/// Генерирует метод validate() -> Evaluation, который проверяет все поля с атрибутами
+@attached(member, names: named(validate))
+public macro RequirementModel() = #externalMacro(module: "RequirementsKitMacros", type: "RequirementModelMacro")
+

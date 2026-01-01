@@ -80,6 +80,7 @@ let result = canTrade.evaluate(context)
 ### Валидация данных
 
 - <doc:DataValidation>
+- <doc:MacroReference>
 
 ### Продвинутые паттерны
 

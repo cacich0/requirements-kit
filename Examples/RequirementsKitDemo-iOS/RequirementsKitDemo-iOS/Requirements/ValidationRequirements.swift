@@ -4,9 +4,33 @@ import Foundation
 // MARK: - Validation Requirements
 // Демонстрация: String validation (requireMatches, requireMinLength, requireMaxLength),
 // ValidationPattern, Collection validation, Range validation
+// Макросы для валидации (#requireEmail, #requireMinLength, #requireMaxLength, и др.)
 
 /// Требования для валидации форм
 enum ValidationRequirements {
+  
+  // MARK: - Примеры с макросами
+  
+  /// Email валидация через макрос (упрощенная версия)
+  static let emailValidMacro: Requirement<FormContext> = #requireEmail(\.email)
+  
+  /// Username валидация через макросы
+  static let usernameValidMacro: Requirement<FormContext> = #all {
+    #requireMinLength(\.username, 3)
+    #requireMaxLength(\.username, 20)
+    #requireMatches(\.username, pattern: ValidationPattern.alphanumeric)
+  }
+  
+  /// Password валидация через макросы
+  static let passwordValidMacro: Requirement<FormContext> = #all {
+    #requireMinLength(\.password, 8)
+    #requireMatches(\.password, pattern: ".*[0-9].*")
+    #requireMatches(\.password, pattern: ".*[A-Z].*")
+    #requireMatches(\.password, pattern: ".*[a-z].*")
+  }
+  
+  /// Phone валидация через макрос
+  static let phoneValidMacro: Requirement<FormContext> = #requirePhone(\.phone)
   
   // MARK: - Email Validation
   

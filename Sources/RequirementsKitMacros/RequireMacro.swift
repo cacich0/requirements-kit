@@ -256,6 +256,385 @@ public struct RequireOrElseMacro: ExpressionMacro {
   }
 }
 
+// MARK: - String Validation Macros
+
+/// Макрос для проверки строки на соответствие регулярному выражению
+/// Преобразует #requireMatches(\.email, pattern: "...") в Requirement.requireMatches(\.email, pattern: "...")
+public struct RequireMatchesMacro: ExpressionMacro {
+  public static func expansion(
+    of node: some FreestandingMacroExpansionSyntax,
+    in context: some MacroExpansionContext
+  ) -> ExprSyntax {
+    guard !node.arguments.isEmpty else {
+      return "Requirement.always"
+    }
+    
+    return ExprSyntax(
+      FunctionCallExprSyntax(
+        calledExpression: MemberAccessExprSyntax(
+          base: DeclReferenceExprSyntax(baseName: "Requirement"),
+          period: .periodToken(),
+          declName: DeclReferenceExprSyntax(baseName: "requireMatches")
+        ),
+        leftParen: .leftParenToken(),
+        arguments: node.arguments,
+        rightParen: .rightParenToken()
+      )
+    )
+  }
+}
+
+/// Макрос для проверки минимальной длины строки
+/// Преобразует #requireMinLength(\.username, 3) в Requirement.requireMinLength(\.username, minLength: 3)
+public struct RequireMinLengthMacro: ExpressionMacro {
+  public static func expansion(
+    of node: some FreestandingMacroExpansionSyntax,
+    in context: some MacroExpansionContext
+  ) -> ExprSyntax {
+    guard node.arguments.count >= 2 else {
+      return "Requirement.always"
+    }
+    
+    let keyPath = node.arguments.first!.expression
+    let minLength = node.arguments.dropFirst().first!.expression
+    
+    return "Requirement.requireMinLength(\(keyPath), minLength: \(minLength))"
+  }
+}
+
+/// Макрос для проверки максимальной длины строки
+/// Преобразует #requireMaxLength(\.username, 20) в Requirement.requireMaxLength(\.username, maxLength: 20)
+public struct RequireMaxLengthMacro: ExpressionMacro {
+  public static func expansion(
+    of node: some FreestandingMacroExpansionSyntax,
+    in context: some MacroExpansionContext
+  ) -> ExprSyntax {
+    guard node.arguments.count >= 2 else {
+      return "Requirement.always"
+    }
+    
+    let keyPath = node.arguments.first!.expression
+    let maxLength = node.arguments.dropFirst().first!.expression
+    
+    return "Requirement.requireMaxLength(\(keyPath), maxLength: \(maxLength))"
+  }
+}
+
+/// Макрос для проверки длины строки в диапазоне
+/// Преобразует #requireLength(\.password, in: 8...128) в Requirement.requireLength(\.password, in: 8...128)
+public struct RequireLengthMacro: ExpressionMacro {
+  public static func expansion(
+    of node: some FreestandingMacroExpansionSyntax,
+    in context: some MacroExpansionContext
+  ) -> ExprSyntax {
+    guard !node.arguments.isEmpty else {
+      return "Requirement.always"
+    }
+    
+    return ExprSyntax(
+      FunctionCallExprSyntax(
+        calledExpression: MemberAccessExprSyntax(
+          base: DeclReferenceExprSyntax(baseName: "Requirement"),
+          period: .periodToken(),
+          declName: DeclReferenceExprSyntax(baseName: "requireLength")
+        ),
+        leftParen: .leftParenToken(),
+        arguments: node.arguments,
+        rightParen: .rightParenToken()
+      )
+    )
+  }
+}
+
+/// Макрос для проверки, что строка не пустая
+/// Преобразует #requireNotBlank(\.name) в Requirement.requireNotBlank(\.name)
+public struct RequireNotBlankMacro: ExpressionMacro {
+  public static func expansion(
+    of node: some FreestandingMacroExpansionSyntax,
+    in context: some MacroExpansionContext
+  ) -> ExprSyntax {
+    guard let keyPath = node.arguments.first?.expression else {
+      return "Requirement.always"
+    }
+    
+    return ExprSyntax(
+      FunctionCallExprSyntax(
+        calledExpression: MemberAccessExprSyntax(
+          base: DeclReferenceExprSyntax(baseName: "Requirement"),
+          period: .periodToken(),
+          declName: DeclReferenceExprSyntax(baseName: "requireNotBlank")
+        ),
+        leftParen: .leftParenToken(),
+        arguments: [LabeledExprSyntax(expression: keyPath)],
+        rightParen: .rightParenToken()
+      )
+    )
+  }
+}
+
+/// Макрос для валидации email
+/// Преобразует #requireEmail(\.email) в Requirement.requireMatches(\.email, pattern: ValidationPattern.email)
+public struct RequireEmailMacro: ExpressionMacro {
+  public static func expansion(
+    of node: some FreestandingMacroExpansionSyntax,
+    in context: some MacroExpansionContext
+  ) -> ExprSyntax {
+    guard let keyPath = node.arguments.first?.expression else {
+      return "Requirement.always"
+    }
+    
+    return "Requirement.requireMatches(\(keyPath), pattern: ValidationPattern.email)"
+  }
+}
+
+/// Макрос для валидации URL
+/// Преобразует #requireURL(\.website) в Requirement.requireMatches(\.website, pattern: ValidationPattern.url)
+public struct RequireURLMacro: ExpressionMacro {
+  public static func expansion(
+    of node: some FreestandingMacroExpansionSyntax,
+    in context: some MacroExpansionContext
+  ) -> ExprSyntax {
+    guard let keyPath = node.arguments.first?.expression else {
+      return "Requirement.always"
+    }
+    
+    return "Requirement.requireMatches(\(keyPath), pattern: ValidationPattern.url)"
+  }
+}
+
+/// Макрос для валидации телефона
+/// Преобразует #requirePhone(\.phoneNumber) в Requirement.requireMatches(\.phoneNumber, pattern: ValidationPattern.phoneInternational)
+public struct RequirePhoneMacro: ExpressionMacro {
+  public static func expansion(
+    of node: some FreestandingMacroExpansionSyntax,
+    in context: some MacroExpansionContext
+  ) -> ExprSyntax {
+    guard let keyPath = node.arguments.first?.expression else {
+      return "Requirement.always"
+    }
+    
+    return "Requirement.requireMatches(\(keyPath), pattern: ValidationPattern.phoneInternational)"
+  }
+}
+
+// MARK: - Collection Validation Macros
+
+/// Макрос для проверки количества элементов
+/// Преобразует #requireCount(\.items, min: 1, max: 50) в Requirement.requireCount(\.items, min: 1, max: 50)
+public struct RequireCountMacro: ExpressionMacro {
+  public static func expansion(
+    of node: some FreestandingMacroExpansionSyntax,
+    in context: some MacroExpansionContext
+  ) -> ExprSyntax {
+    guard !node.arguments.isEmpty else {
+      return "Requirement.always"
+    }
+    
+    return ExprSyntax(
+      FunctionCallExprSyntax(
+        calledExpression: MemberAccessExprSyntax(
+          base: DeclReferenceExprSyntax(baseName: "Requirement"),
+          period: .periodToken(),
+          declName: DeclReferenceExprSyntax(baseName: "requireCount")
+        ),
+        leftParen: .leftParenToken(),
+        arguments: node.arguments,
+        rightParen: .rightParenToken()
+      )
+    )
+  }
+}
+
+/// Макрос для проверки, что коллекция не пустая
+/// Преобразует #requireNotEmpty(\.cart) в Requirement.requireNotEmpty(\.cart)
+public struct RequireNotEmptyMacro: ExpressionMacro {
+  public static func expansion(
+    of node: some FreestandingMacroExpansionSyntax,
+    in context: some MacroExpansionContext
+  ) -> ExprSyntax {
+    guard let keyPath = node.arguments.first?.expression else {
+      return "Requirement.always"
+    }
+    
+    return ExprSyntax(
+      FunctionCallExprSyntax(
+        calledExpression: MemberAccessExprSyntax(
+          base: DeclReferenceExprSyntax(baseName: "Requirement"),
+          period: .periodToken(),
+          declName: DeclReferenceExprSyntax(baseName: "requireNotEmpty")
+        ),
+        leftParen: .leftParenToken(),
+        arguments: [LabeledExprSyntax(expression: keyPath)],
+        rightParen: .rightParenToken()
+      )
+    )
+  }
+}
+
+/// Макрос для проверки, что коллекция пустая
+/// Преобразует #requireEmpty(\.errors) в Requirement.requireEmpty(\.errors)
+public struct RequireEmptyMacro: ExpressionMacro {
+  public static func expansion(
+    of node: some FreestandingMacroExpansionSyntax,
+    in context: some MacroExpansionContext
+  ) -> ExprSyntax {
+    guard let keyPath = node.arguments.first?.expression else {
+      return "Requirement.always"
+    }
+    
+    return ExprSyntax(
+      FunctionCallExprSyntax(
+        calledExpression: MemberAccessExprSyntax(
+          base: DeclReferenceExprSyntax(baseName: "Requirement"),
+          period: .periodToken(),
+          declName: DeclReferenceExprSyntax(baseName: "requireEmpty")
+        ),
+        leftParen: .leftParenToken(),
+        arguments: [LabeledExprSyntax(expression: keyPath)],
+        rightParen: .rightParenToken()
+      )
+    )
+  }
+}
+
+// MARK: - Optional Validation Macros
+
+/// Макрос для проверки, что Optional не nil
+/// Преобразует #requireNonNil(\.userId) в соответствующее требование
+public struct RequireNonNilMacro: ExpressionMacro {
+  public static func expansion(
+    of node: some FreestandingMacroExpansionSyntax,
+    in context: some MacroExpansionContext
+  ) -> ExprSyntax {
+    guard let keyPath = node.arguments.first?.expression else {
+      return "Requirement.always"
+    }
+    
+    return """
+    Requirement { context in
+      context[keyPath: \(keyPath)] != nil
+        ? .confirmed
+        : .failed(reason: Reason(code: "optional.is_nil", message: "Value must not be nil"))
+    }
+    """
+  }
+}
+
+/// Макрос для проверки, что Optional nil
+/// Преобразует #requireNil(\.tempData) в соответствующее требование
+public struct RequireNilMacro: ExpressionMacro {
+  public static func expansion(
+    of node: some FreestandingMacroExpansionSyntax,
+    in context: some MacroExpansionContext
+  ) -> ExprSyntax {
+    guard let keyPath = node.arguments.first?.expression else {
+      return "Requirement.always"
+    }
+    
+    return """
+    Requirement { context in
+      context[keyPath: \(keyPath)] == nil
+        ? .confirmed
+        : .failed(reason: Reason(code: "optional.is_not_nil", message: "Value must be nil"))
+    }
+    """
+  }
+}
+
+/// Макрос для проверки Optional с условием
+/// Преобразует #requireSome(\.age, where: { $0 >= 18 }) в Requirement.requireSome(\.age, where: { $0 >= 18 })
+public struct RequireSomeMacro: ExpressionMacro {
+  public static func expansion(
+    of node: some FreestandingMacroExpansionSyntax,
+    in context: some MacroExpansionContext
+  ) -> ExprSyntax {
+    guard !node.arguments.isEmpty else {
+      return "Requirement.always"
+    }
+    
+    // Создаем вызов Requirement.requireSome со всеми аргументами
+    return ExprSyntax(
+      FunctionCallExprSyntax(
+        calledExpression: MemberAccessExprSyntax(
+          base: DeclReferenceExprSyntax(baseName: "Requirement"),
+          period: .periodToken(),
+          declName: DeclReferenceExprSyntax(baseName: "requireSome")
+        ),
+        leftParen: .leftParenToken(),
+        arguments: node.arguments,
+        rightParen: .rightParenToken()
+      )
+    )
+  }
+}
+
+// MARK: - Range Validation Macros
+
+/// Макрос для проверки значения в диапазоне
+/// Преобразует #requireInRange(\.age, 18...120) в соответствующее требование
+public struct RequireInRangeMacro: ExpressionMacro {
+  public static func expansion(
+    of node: some FreestandingMacroExpansionSyntax,
+    in context: some MacroExpansionContext
+  ) -> ExprSyntax {
+    guard node.arguments.count >= 2 else {
+      return "Requirement.always"
+    }
+    
+    let keyPath = node.arguments.first!.expression
+    let range = node.arguments.dropFirst().first!.expression
+    
+    return """
+    Requirement { context in
+      let value = context[keyPath: \(keyPath)]
+      let range = \(range)
+      return range.contains(value)
+        ? .confirmed
+        : .failed(reason: Reason(
+            code: "range.out_of_bounds",
+            message: "Value must be in range \\(range)"
+          ))
+    }
+    """
+  }
+}
+
+/// Макрос для проверки значения между min и max
+/// Преобразует #requireBetween(\.amount, min: 10, max: 1000) в соответствующее требование
+public struct RequireBetweenMacro: ExpressionMacro {
+  public static func expansion(
+    of node: some FreestandingMacroExpansionSyntax,
+    in context: some MacroExpansionContext
+  ) -> ExprSyntax {
+    guard node.arguments.count >= 3 else {
+      return "Requirement.always"
+    }
+    
+    let keyPath = node.arguments.first!.expression
+    
+    let minArg = node.arguments.first(where: { $0.label?.text == "min" })?.expression
+    let maxArg = node.arguments.first(where: { $0.label?.text == "max" })?.expression
+    
+    guard let min = minArg, let max = maxArg else {
+      return "Requirement.always"
+    }
+    
+    return """
+    Requirement { context in
+      let value = context[keyPath: \(keyPath)]
+      let min = \(min)
+      let max = \(max)
+      return (value >= min && value <= max)
+        ? .confirmed
+        : .failed(reason: Reason(
+            code: "range.out_of_bounds",
+            message: "Value must be between \\(min) and \\(max)"
+          ))
+    }
+    """
+  }
+}
+
 @main
 struct RequirementsKitMacroPlugin: CompilerPlugin {
   let providingMacros: [Macro.Type] = [
@@ -268,7 +647,30 @@ struct RequirementsKitMacroPlugin: CompilerPlugin {
     UnlessMacro.self,
     XorMacro.self,
     WarnMacro.self,
-    RequireOrElseMacro.self
+    RequireOrElseMacro.self,
+    // String validation macros
+    RequireMatchesMacro.self,
+    RequireMinLengthMacro.self,
+    RequireMaxLengthMacro.self,
+    RequireLengthMacro.self,
+    RequireNotBlankMacro.self,
+    RequireEmailMacro.self,
+    RequireURLMacro.self,
+    RequirePhoneMacro.self,
+    // Collection validation macros
+    RequireCountMacro.self,
+    RequireNotEmptyMacro.self,
+    RequireEmptyMacro.self,
+    // Optional validation macros
+    RequireNonNilMacro.self,
+    RequireNilMacro.self,
+    RequireSomeMacro.self,
+    // Range validation macros
+    RequireInRangeMacro.self,
+    RequireBetweenMacro.self,
+    // Attached macros
+    RequirementModelMacro.self,
+    ValidationAttributeMacro.self
   ]
 }
 

@@ -39,6 +39,36 @@ extension Requirement {
   }
 }
 
+// MARK: - Optional значения
+
+extension Requirement {
+  /// Создает требование для проверки Optional значения с предикатом
+  /// - Parameters:
+  ///   - keyPath: Путь к Optional свойству
+  ///   - predicate: Предикат для проверки значения
+  /// - Returns: Требование
+  public static func requireSome<Value: Sendable>(
+    _ keyPath: KeyPath<Context, Value?> & Sendable,
+    where predicate: @escaping @Sendable (Value) -> Bool
+  ) -> Requirement<Context> {
+    Requirement { context in
+      if let value = context[keyPath: keyPath] {
+        return predicate(value)
+          ? .confirmed
+          : .failed(reason: Reason(
+              code: "optional.predicate_failed",
+              message: "Optional value does not satisfy predicate"
+            ))
+      } else {
+        return .failed(reason: Reason(
+          code: "optional.is_nil",
+          message: "Optional value is nil"
+        ))
+      }
+    }
+  }
+}
+
 // MARK: - Описание причин отказа
 
 extension Requirement {
