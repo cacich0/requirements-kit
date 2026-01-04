@@ -68,6 +68,9 @@ let result = canTrade.evaluate(context)
 - Параллельная проверка с `.allConcurrent()` и `.anyConcurrent()`
 - Кэширование результатов с настраиваемым TTL
 - Поддержка таймаутов для асинхронных проверок
+- **Rate Limiting** — ограничение количества вызовов за период времени
+- **Throttling** — минимальный интервал между вызовами
+- **Debounce** — отложенное выполнение после завершения ввода
 
 ### 🔍 Debugging и трассировка
 - Детальная трассировка проверки требований
@@ -461,6 +464,124 @@ let result2 = cached.evaluate(context) // берётся из кэша
 cached.invalidate(context)
 cached.invalidateAll()
 ```
+
+### Rate Limiting, Throttling и Debounce
+
+Контролируйте частоту выполнения требований для оптимизации производительности и защиты от перегрузки.
+
+#### Rate Limiting
+
+Ограничивает количество вызовов за период времени (например, максимум 100 запросов в минуту):
+
+```swift
+let apiRequirement = AsyncRequirement<User> { user in
+    let response = try await api.fetchUserData(user.id)
+    return response.isValid ? .confirmed : .failed(reason: Reason(message: "Invalid"))
+}
+.rateLimit(
+    maxCalls: 100,
+    timeWindow: 60,
+    behavior: .returnCached // При превышении вернуть кэш
+)
+
+// Использование
+do {
+    let result = try await apiRequirement.evaluate(user)
+    print("Result:", result)
+} catch {
+    print("Error:", error)
+}
+```
+
+**Поведение при превышении лимита:**
+- `.returnFailed(Reason(...))` — вернуть ошибку (по умолчанию)
+- `.returnCached` — вернуть последний успешный результат
+- `.skip` — пропустить проверку и вернуть .confirmed
+
+#### Throttling
+
+Гарантирует минимальный интервал между вызовами (например, не чаще раза в секунду):
+
+```swift
+let validationRequirement = Requirement<String> { text in
+    // Дорогая валидация
+    expensiveValidation(text)
+}
+.throttle(
+    interval: 1.0,
+    behavior: .returnCached
+)
+
+let result1 = validationRequirement.evaluate("text1") // ✅ Выполнится
+let result2 = validationRequirement.evaluate("text2") // ↩️ Вернёт кэш
+```
+
+#### Debounce
+
+Откладывает выполнение до тех пор, пока не пройдет интервал без новых вызовов (идеально для поиска):
+
+```swift
+@available(macOS 13.0, iOS 16.0, *)
+let searchRequirement = AsyncRequirement<String> { query in
+    let results = try await api.search(query: query)
+    return results.isEmpty ? .failed(reason: Reason(message: "No results")) : .confirmed
+}
+.debounce(delay: 0.3) // Подождать 300ms после последнего ввода
+
+// Использование в SwiftUI
+func performSearch(_ text: String) async {
+    do {
+        let result = try await searchRequirement.evaluate(text)
+        // Обновить UI
+    } catch {
+        print("Search error:", error)
+    }
+}
+```
+
+**Комбинирование механизмов:**
+
+```swift
+let complexRequirement = AsyncRequirement<Request> { request in
+    try await api.execute(request)
+}
+.debounce(delay: 0.2)           // Отложить на 200ms
+.throttle(interval: 0.5)         // Минимум 0.5 сек между вызовами
+.rateLimit(                      // Максимум 50 запросов в минуту
+    maxCalls: 50,
+    timeWindow: 60,
+    behavior: .returnCached
+)
+```
+
+**Использование внутри композиции:**
+
+```swift
+// Rate limiting и throttling можно применять к отдельным требованиям!
+let requirement = Requirement<User>.all {
+    // Первое требование с rate limiting
+    Requirement<User> { user in
+        validateWithAPI(user.email)
+    }
+    .rateLimit(maxCalls: 10, timeWindow: 60)
+    
+    // Второе требование с throttling
+    Requirement<User> { user in
+        checkDatabase(user.id)
+    }
+    .throttle(interval: 1.0, behavior: .returnCached)
+    
+    // Обычное требование
+    Requirement<User>.require(\.isActive)
+}
+```
+
+**Когда использовать:**
+- **Rate Limiting**: API с ограничением запросов, защита от DDoS
+- **Throttling**: Автосохранение, регулярные обновления
+- **Debounce**: Поиск при вводе, валидация форм в реальном времени
+
+Подробнее: [Документация Rate Limiting](Documentation.docc/RateLimitingAndThrottling.md)
 
 ### Middleware
 

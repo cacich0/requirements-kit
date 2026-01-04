@@ -148,6 +148,14 @@ extension AsyncRequirement {
     }
   }
   
+  /// Композиция: все асинхронные требования должны быть выполнены (с builder)
+  public static func all(
+    @AsyncRequirementsBuilder<Context> builder: () -> [AsyncRequirement<Context>]
+  ) -> AsyncRequirement<Context> {
+    let requirements = builder()
+    return all(requirements)
+  }
+  
   /// Композиция: все асинхронные требования должны быть выполнены (параллельно)
   public static func allConcurrent(_ requirements: [AsyncRequirement<Context>]) -> AsyncRequirement<Context> {
     AsyncRequirement { context in
@@ -175,6 +183,14 @@ extension AsyncRequirement {
     }
   }
   
+  /// Композиция: все асинхронные требования должны быть выполнены параллельно (с builder)
+  public static func allConcurrent(
+    @AsyncRequirementsBuilder<Context> builder: () -> [AsyncRequirement<Context>]
+  ) -> AsyncRequirement<Context> {
+    let requirements = builder()
+    return allConcurrent(requirements)
+  }
+  
   /// Композиция: хотя бы одно асинхронное требование должно быть выполнено
   public static func any(_ requirements: [AsyncRequirement<Context>]) -> AsyncRequirement<Context> {
     AsyncRequirement { context in
@@ -190,6 +206,14 @@ extension AsyncRequirement {
         message: "None of the alternative requirements were met"
       ))
     }
+  }
+  
+  /// Композиция: хотя бы одно асинхронное требование должно быть выполнено (с builder)
+  public static func any(
+    @AsyncRequirementsBuilder<Context> builder: () -> [AsyncRequirement<Context>]
+  ) -> AsyncRequirement<Context> {
+    let requirements = builder()
+    return any(requirements)
   }
   
   /// Композиция: хотя бы одно асинхронное требование должно быть выполнено (параллельно, первый успешный)
@@ -215,6 +239,14 @@ extension AsyncRequirement {
         ))
       }
     }
+  }
+  
+  /// Композиция: хотя бы одно асинхронное требование должно быть выполнено параллельно (с builder)
+  public static func anyConcurrent(
+    @AsyncRequirementsBuilder<Context> builder: () -> [AsyncRequirement<Context>]
+  ) -> AsyncRequirement<Context> {
+    let requirements = builder()
+    return anyConcurrent(requirements)
   }
   
   /// Инверсия асинхронного требования

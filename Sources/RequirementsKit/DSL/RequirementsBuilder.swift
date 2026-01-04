@@ -47,3 +47,25 @@ public enum RequirementsBuilder<Context: Sendable> {
     component
   }
 }
+
+// MARK: - Rate Limiting Support
+
+extension RequirementsBuilder {
+  /// Поддержка RateLimitedRequirement в builder
+  public static func buildExpression(
+    _ expression: RateLimitedRequirement<Context>
+  ) -> [Requirement<Context>] {
+    [Requirement { context in
+      expression.evaluate(context)
+    }]
+  }
+  
+  /// Поддержка ThrottledRequirement в builder
+  public static func buildExpression(
+    _ expression: ThrottledRequirement<Context>
+  ) -> [Requirement<Context>] {
+    [Requirement { context in
+      expression.evaluate(context)
+    }]
+  }
+}
