@@ -219,7 +219,7 @@ public struct WarnMacro: ExpressionMacro {
     of node: some FreestandingMacroExpansionSyntax,
     in context: some MacroExpansionContext
   ) -> ExprSyntax {
-    guard let argument = node.arguments.first?.expression else {
+    guard !node.arguments.isEmpty else {
       return "Requirement.always"
     }
     
@@ -668,6 +668,26 @@ struct RequirementsKitMacroPlugin: CompilerPlugin {
     // Range validation macros
     RequireInRangeMacro.self,
     RequireBetweenMacro.self,
+    // Decision macros
+    DecideMacro.self,
+    AsyncDecideMacro.self,
+    DecidedMacro.self,
+    // Decision KeyPath macros
+    WhenDecisionMacro.self,
+    UnlessDecisionMacro.self,
+    // Decision composition macros
+    FirstMatchMacro.self,
+    MatchDecisionMacro.self,
+    OrElseMacro.self,
+    // Decision integration macros
+    WhenMetMacro.self,
+    // Async Decision macros
+    AsyncWhenDecisionMacro.self,
+    AsyncUnlessDecisionMacro.self,
+    AsyncFirstMatchMacro.self,
+    AsyncMatchDecisionMacro.self,
+    AsyncOrElseMacro.self,
+    AsyncWhenMetMacro.self,
     // Attached macros
     RequirementModelMacro.self,
     ValidationAttributeMacro.self

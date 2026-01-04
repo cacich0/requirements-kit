@@ -103,17 +103,10 @@ struct RateLimitingExamples {
     // Симуляция сложной проверки
     try await Task.sleep(nanoseconds: 100_000_000)
     
-    let isValid = !user.name.isEmpty && !user.email.isEmpty
+    let isValid = !user.username.isEmpty && !user.email.isEmpty
     return isValid ? .confirmed : .failed(reason: Reason(message: "Invalid user data"))
   }
   .debounce(delay: 0.2)           // Отложить выполнение на 200ms
-  .throttle(interval: 0.5)         // Не чаще раза в 500ms
-  .rateLimit(                      // Максимум 50 вызовов в минуту
-    maxCalls: 50,
-    timeWindow: 60,
-    behavior: .returnCached
-  )
-  
   // MARK: - Композиция с Rate Limiting
   
   /// Пример использования rate limiting внутри композиции
@@ -128,7 +121,7 @@ struct RateLimitingExamples {
     
     // Проверка имени с throttling (не чаще раза в секунду)
     Requirement<User> { user in
-      let isValid = user.name.count >= 2
+      let isValid = user.username.count >= 2
       return isValid ? .confirmed : .failed(reason: Reason(message: "Name too short"))
     }
     .throttle(interval: 1.0, behavior: .returnCached)
@@ -150,7 +143,7 @@ struct RateLimitingExamples {
     // Database проверка с throttling
     AsyncRequirement<User> { user in
       try await Task.sleep(nanoseconds: 30_000_000)
-      return user.name.count >= 2 ? .confirmed : .failed(reason: Reason(message: "Invalid"))
+      return user.username.count >= 2 ? .confirmed : .failed(reason: Reason(message: "Invalid"))
     }
     .throttle(interval: 2.0, behavior: .returnCached)
     
@@ -234,7 +227,6 @@ extension RateLimitingExamples {
       return .confirmed
     }
     .debounce(delay: 0.3)
-    .rateLimit(maxCalls: 20, timeWindow: 60)
     
     func performSearch() async {
       isSearching = true

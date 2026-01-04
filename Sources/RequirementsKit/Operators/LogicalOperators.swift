@@ -92,3 +92,29 @@ public func || <Context: Sendable>(
   AsyncRequirement.any([lhs, AsyncRequirement.from(rhs)])
 }
 
+// MARK: - Операторы для Decision
+
+/// Коалесцирующий оператор для Decision (аналог fallbackDefault)
+/// - Parameters:
+///   - lhs: Решение
+///   - rhs: Значение по умолчанию
+/// - Returns: Решение, которое всегда возвращает значение
+public func ?? <Context: Sendable, Result: Sendable>(
+  lhs: Decision<Context, Result>,
+  rhs: Result
+) -> Decision<Context, Result> {
+  lhs.fallbackDefault(rhs)
+}
+
+/// Коалесцирующий оператор для AsyncDecision (аналог fallbackDefault)
+/// - Parameters:
+///   - lhs: Асинхронное решение
+///   - rhs: Значение по умолчанию
+/// - Returns: Решение, которое всегда возвращает значение
+public func ?? <Context: Sendable, Result: Sendable>(
+  lhs: AsyncDecision<Context, Result>,
+  rhs: Result
+) -> AsyncDecision<Context, Result> {
+  lhs.fallbackDefault(rhs)
+}
+

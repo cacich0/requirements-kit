@@ -23,6 +23,11 @@ struct ContentView: View {
           Label("Subscription", systemImage: "crown")
         }
       
+      DecisionDemoView()
+        .tabItem {
+          Label("Decision", systemImage: "arrow.triangle.branch")
+        }
+      
       ValidationDemoView()
         .tabItem {
           Label("Validation", systemImage: "checkmark.shield")

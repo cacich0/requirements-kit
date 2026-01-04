@@ -34,6 +34,34 @@ let canTrade = Requirement<TradingContext> = #all {
 let result = canTrade.evaluate(context)
 ```
 
+---
+
+Для принятия решений о конкретных значениях (а не только проверки условий), используйте **Decision**:
+
+**Декларативный подход с Decision:**
+```swift
+let paymentMethodDecision: Decision<PaymentContext, PaymentProvider> = #firstMatch {
+  #whenMet(
+    #all {
+      #require(\.amount, lessThan: 100)
+      #require(\.isRecurring, equals: false)
+    },
+    return: .applePay
+  )
+
+  #whenDecision(\.amount, greaterThanOrEqual: 10000, return: .bankTransfer)
+  #whenDecision(\.isRecurring, equals: true, return: .stripe)
+  #whenMet(#require(\.user.isPremium), return: .stripe)
+  #whenDecision(\.user.isVerified, equals: true, return: .paypal)
+  
+  #orElse(.bankTransfer)
+}
+
+let paymentMethod = paymentMethodDecision.decide(context)
+```
+
+---
+
 ## Features
 
 ### 🎯 Декларативный синтаксис
@@ -121,6 +149,14 @@ let result = canTrade.evaluate(context)
 - Полная поддержка Swift Concurrency (Sendable, async/await)
 - Потокобезопасность (Swift 6.0+)
 - Без внешних зависимостей
+
+### 🎯 Система принятия решений (Decision)
+- **Decision / AsyncDecision** — принятие решений с возвратом конкретных значений
+- Выбор между несколькими вариантами на основе контекста
+- Fallback цепочки и композиция решений
+- Интеграция с Requirements для условных решений
+- Property wrappers `@Decided` и `@AsyncDecided`
+- Трансформации: `map`, `compactMap`, `filter`, `then`
 
 ---
 
@@ -321,6 +357,63 @@ let either = requirement1 || requirement2
 
 // NOT
 let notPremium = !requirement2
+```
+
+### Decision — принятие решений
+
+В отличие от Requirements, которые проверяют условия, Decision позволяет выбирать конкретные значения на основе контекста:
+
+```swift
+enum AppRoute: Sendable {
+  case onboarding
+  case login
+  case dashboard
+  case settings
+}
+
+struct AppContext: Sendable {
+  let isFirstLaunch: Bool
+  let isAuthenticated: Bool
+  let hasCompletedOnboarding: Bool
+}
+
+// Определяем логику выбора маршрута
+let routeDecision = Decision<AppContext, AppRoute> { ctx in
+  if ctx.isFirstLaunch && !ctx.hasCompletedOnboarding {
+    return .onboarding
+  }
+  if !ctx.isAuthenticated {
+    return .login
+  }
+  return .dashboard
+}
+
+// Принимаем решение
+let context = AppContext(
+  isFirstLaunch: false, 
+  isAuthenticated: true, 
+  hasCompletedOnboarding: true
+)
+let route = routeDecision.decide(context) // .dashboard
+```
+
+Fallback цепочки для альтернативных решений:
+
+```swift
+let primaryDecision = Decision<UserContext, String> { ctx in
+  ctx.isPremium ? "Premium Dashboard" : nil
+}
+
+let fallbackDecision = Decision<UserContext, String> { ctx in
+  ctx.isLoggedIn ? "Regular Dashboard" : "Login"
+}
+
+// Если primary вернет nil, используется fallback
+let finalDecision = primaryDecision
+  .fallback(fallbackDecision)
+  .fallbackDefault("Welcome")
+
+let result = finalDecision.decide(context) // Всегда вернет значение
 ```
 
 ### Fluent API
@@ -1033,6 +1126,189 @@ if case .failed = result {
 }
 ```
 
+### Система принятия решений (Decision)
+
+Decision дополняет систему Requirements, позволяя не просто проверять условия, а выбирать конкретные значения на основе контекста.
+
+#### Базовое использование
+
+```swift
+enum AppRoute: Sendable {
+  case onboarding
+  case login
+  case dashboard
+  case settings
+}
+
+struct AppContext: Sendable {
+  let user: User
+  let isFirstLaunch: Bool
+}
+
+// Создание решения
+let routeDecision = Decision<AppContext, AppRoute> { ctx in
+  if ctx.isFirstLaunch {
+    return .onboarding
+  }
+  if !ctx.user.isLoggedIn {
+    return .login
+  }
+  return .dashboard
+}
+
+// Принятие решения
+let route = routeDecision.decide(context)
+```
+
+#### Fallback цепочки
+
+```swift
+let primaryRoute = Decision<AppContext, AppRoute> { ctx in
+  ctx.user.isAdmin ? .settings : nil
+}
+
+let secondaryRoute = Decision<AppContext, AppRoute> { ctx in
+  ctx.user.isLoggedIn ? .dashboard : nil
+}
+
+// Композиция с fallback
+let finalRoute = primaryRoute
+  .fallback(secondaryRoute)
+  .fallbackDefault(.login) // Гарантирует результат
+
+let route = finalRoute.decide(context) // Всегда вернет значение
+```
+
+#### Интеграция с Requirements
+
+```swift
+let authRequirement = Requirement<User> { user in
+  user.isLoggedIn 
+    ? .confirmed 
+    : .failed(reason: Reason(message: "Not authenticated"))
+}
+
+// Решение на основе требования
+let featureDecision = Decision<User, String>.when(
+  authRequirement,
+  return: "Premium Feature"
+).fallbackDefault("Standard Feature")
+
+let feature = featureDecision.decide(user)
+```
+
+#### Трансформации
+
+```swift
+// map - преобразование результата
+let valueDecision = Decision<User, Int> { user in user.level }
+let stringDecision = valueDecision.map { "Level \($0)" }
+
+// compactMap - преобразование с фильтрацией
+let highLevelOnly = valueDecision.compactMap { level in
+  level >= 10 ? "High Level \(level)" : nil
+}
+
+// filter - фильтрация результата
+let onlyDashboard = routeDecision.filter { $0 == .dashboard }
+```
+
+#### Асинхронные решения
+
+```swift
+let asyncDecision = AsyncDecision<User, Route> { user in
+  let profile = try await api.fetchProfile(user.id)
+  return profile.isPremium ? .premiumDashboard : .dashboard
+}
+
+// Использование
+let route = try await asyncDecision.decide(user)
+
+// С таймаутом
+@available(iOS 16.0, *)
+let timedDecision = AsyncDecision<User, Route>.withTimeout(
+  seconds: 5.0,
+  asyncDecision
+)
+```
+
+#### Property Wrappers
+
+```swift
+struct ViewModel {
+  let user: User
+  
+  @Decided(decision: routeDecision)
+  var currentRoute: AppRoute?
+  
+  init(user: User) {
+    self.user = user
+    _currentRoute = Decided(
+      decision: routeDecision,
+      context: AppContext(user: user, isFirstLaunch: false),
+      defaultValue: .dashboard
+    )
+  }
+}
+
+let viewModel = ViewModel(user: user)
+print(viewModel.currentRoute) // .dashboard
+```
+
+#### Практические примеры
+
+**Выбор провайдера оплаты:**
+
+```swift
+enum PaymentProvider: Sendable {
+  case stripe
+  case paypal
+  case applePay
+  case bankTransfer
+}
+
+let paymentDecision = Decision<PaymentContext, PaymentProvider> { ctx in
+  if ctx.amount < 100 {
+    return .applePay
+  }
+  if ctx.amount >= 10000 {
+    return .bankTransfer
+  }
+  if ctx.isRecurring {
+    return .stripe
+  }
+  return .paypal
+}.fallback { ctx in
+  ctx.amount < 500 ? .applePay : .bankTransfer
+}
+```
+
+**Определение уровня доступа:**
+
+```swift
+enum AccessLevel: Sendable {
+  case none, read, write, admin, owner
+}
+
+let accessDecision = Decision<ResourceContext, AccessLevel> { ctx in
+  if ctx.user.isBanned {
+    return .none
+  }
+  if ctx.resourceOwnerId == ctx.user.id {
+    return .owner
+  }
+  if ctx.user.isAdmin {
+    return .admin
+  }
+  if ctx.user.isVerified {
+    return .write
+  }
+  return ctx.isPublic ? .read : .none
+}
+```
+
+Подробнее: [Документация Decision](Documentation.docc/DecisionMaking.md)
+
 ---
 
 ## Debugging and Tracing
@@ -1285,7 +1561,8 @@ RequirementsKit создан для упрощения описания бизн
 ## Дополнительные ресурсы
 
 - [Документация API](Documentation.docc/)
-- [Справочник по макросам](Documentation.docc/MacroReference.md) 📝 **НОВОЕ**
+- [Справочник по макросам](Documentation.docc/MacroReference.md) 📝
+- [Система принятия решений (Decision)](Documentation.docc/DecisionMaking.md) 🎯 **НОВОЕ**
 - [Примеры использования](Examples/)
 - [Демо-приложение iOS](Examples/RequirementsKitDemo-iOS/)
 

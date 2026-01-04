@@ -3,14 +3,16 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 77;
+	objectVersion = 63;
 	objects = {
 
 /* Begin PBXBuildFile section */
 		151CD65C5929A824BEF1927F /* TradingDemoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BECAE86CE3BF7F6CE9DA5094 /* TradingDemoView.swift */; };
 		1AC93BFCE0647A206BD4D458 /* MacrosDemoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F75A48872BF279B0FC498B27 /* MacrosDemoView.swift */; };
+		200221DD2F0A322B000C726F /* RequirementsKit in Frameworks */ = {isa = PBXBuildFile; productRef = 200221DC2F0A322B000C726F /* RequirementsKit */; };
 		37301D8DF1B8717ADDC1D63A /* AuthRequirements.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3C56084B1FAF0642591CA89 /* AuthRequirements.swift */; };
 		394604F4E8E94AF2F7CC7401 /* SubscriptionDemoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4408B6C9E735450BB7A52E14 /* SubscriptionDemoView.swift */; };
+		3B7F869B0EF096649E012869 /* DecisionExamples.swift in Sources */ = {isa = PBXBuildFile; fileRef = 578AA64D14CEBAF28458AB94 /* DecisionExamples.swift */; };
 		65582662DA560BBA3826DB4D /* SubscriptionRequirements.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDEEBF0306ED4F05FE2A884C /* SubscriptionRequirements.swift */; };
 		67D4CDAF1E1664BD00EFB00E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3E8892CAB93C284C7E16ABF4 /* Assets.xcassets */; };
 		7093AEF793C84DFFA8B8AB48 /* RequirementsKit in Frameworks */ = {isa = PBXBuildFile; productRef = 68BDFA2898201B81D5F98BE7 /* RequirementsKit */; };
@@ -18,8 +20,10 @@
 		797EB3BE7B6F63A88F6D06CF /* ValidationRequirements.swift in Sources */ = {isa = PBXBuildFile; fileRef = 428FEDB76C238E6A4E6A52E9 /* ValidationRequirements.swift */; };
 		7EED6234F3F04B056D1CEBDA /* TradingRequirements.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E9DA69305A3FD2F15746BB8 /* TradingRequirements.swift */; };
 		872AACC974EBFB689049285F /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = A753677A5500969540174C93 /* User.swift */; };
+		8793889B5C01A3A1886EBC4C /* DecisionDemoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DAAE2133B49A3BA10A58287 /* DecisionDemoView.swift */; };
 		B784B248632F582F8905CBC0 /* MockServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0C87F5B6A02B98D5BF29FCD /* MockServices.swift */; };
 		BB0B0C7018B656DCF57E3FF2 /* ValidationDemoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 145A01A4BFFE8DE9527C899A /* ValidationDemoView.swift */; };
+		D1A2BA9902C57CFCFECB0C95 /* RateLimitingExamples.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6207B76DA83CCCD9C8CEAA26 /* RateLimitingExamples.swift */; };
 		D22A2D8806C402AA7D67A5CA /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5369ED172BC79BC64BB415C8 /* ContentView.swift */; };
 		D596AEC62338EC8CB0006510 /* Product.swift in Sources */ = {isa = PBXBuildFile; fileRef = 966EBEBDD4845E860882801D /* Product.swift */; };
 		DA96B3B3FD1650DE80E8058E /* Order.swift in Sources */ = {isa = PBXBuildFile; fileRef = B70999DED0A601BD4231DC02 /* Order.swift */; };
@@ -30,13 +34,16 @@
 /* Begin PBXFileReference section */
 		10462E4444F1C2F8D7645B45 /* requirements-kit */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "requirements-kit"; path = ../..; sourceTree = SOURCE_ROOT; };
 		145A01A4BFFE8DE9527C899A /* ValidationDemoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValidationDemoView.swift; sourceTree = "<group>"; };
+		2DAAE2133B49A3BA10A58287 /* DecisionDemoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DecisionDemoView.swift; sourceTree = "<group>"; };
 		3E8892CAB93C284C7E16ABF4 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		416F26398A0640F3DCF86FCF /* ValidatedUser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValidatedUser.swift; sourceTree = "<group>"; };
 		41B1F524521A05507B72BCF0 /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
 		428FEDB76C238E6A4E6A52E9 /* ValidationRequirements.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValidationRequirements.swift; sourceTree = "<group>"; };
 		4408B6C9E735450BB7A52E14 /* SubscriptionDemoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionDemoView.swift; sourceTree = "<group>"; };
 		5369ED172BC79BC64BB415C8 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		578AA64D14CEBAF28458AB94 /* DecisionExamples.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DecisionExamples.swift; sourceTree = "<group>"; };
 		5E9DA69305A3FD2F15746BB8 /* TradingRequirements.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TradingRequirements.swift; sourceTree = "<group>"; };
+		6207B76DA83CCCD9C8CEAA26 /* RateLimitingExamples.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RateLimitingExamples.swift; sourceTree = "<group>"; };
 		63E3911ED5EF35D425DFED93 /* AuthDemoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthDemoView.swift; sourceTree = "<group>"; };
 		966EBEBDD4845E860882801D /* Product.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Product.swift; sourceTree = "<group>"; };
 		A753677A5500969540174C93 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
@@ -44,7 +51,7 @@
 		BECAE86CE3BF7F6CE9DA5094 /* TradingDemoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TradingDemoView.swift; sourceTree = "<group>"; };
 		D3C56084B1FAF0642591CA89 /* AuthRequirements.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthRequirements.swift; sourceTree = "<group>"; };
 		F0C87F5B6A02B98D5BF29FCD /* MockServices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockServices.swift; sourceTree = "<group>"; };
-		F338705BA1EFFA1F8E671DF6 /* RequirementsKitDemo-iOS.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = "RequirementsKitDemo-iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		F338705BA1EFFA1F8E671DF6 /* RequirementsKitDemo-iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "RequirementsKitDemo-iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F75A48872BF279B0FC498B27 /* MacrosDemoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacrosDemoView.swift; sourceTree = "<group>"; };
 		FDEEBF0306ED4F05FE2A884C /* SubscriptionRequirements.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionRequirements.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -55,6 +62,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7093AEF793C84DFFA8B8AB48 /* RequirementsKit in Frameworks */,
+				200221DD2F0A322B000C726F /* RequirementsKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -66,6 +74,7 @@
 			children = (
 				63E3911ED5EF35D425DFED93 /* AuthDemoView.swift */,
 				5369ED172BC79BC64BB415C8 /* ContentView.swift */,
+				2DAAE2133B49A3BA10A58287 /* DecisionDemoView.swift */,
 				F75A48872BF279B0FC498B27 /* MacrosDemoView.swift */,
 				4408B6C9E735450BB7A52E14 /* SubscriptionDemoView.swift */,
 				BECAE86CE3BF7F6CE9DA5094 /* TradingDemoView.swift */,
@@ -110,6 +119,8 @@
 			isa = PBXGroup;
 			children = (
 				D3C56084B1FAF0642591CA89 /* AuthRequirements.swift */,
+				578AA64D14CEBAF28458AB94 /* DecisionExamples.swift */,
+				6207B76DA83CCCD9C8CEAA26 /* RateLimitingExamples.swift */,
 				FDEEBF0306ED4F05FE2A884C /* SubscriptionRequirements.swift */,
 				5E9DA69305A3FD2F15746BB8 /* TradingRequirements.swift */,
 				428FEDB76C238E6A4E6A52E9 /* ValidationRequirements.swift */,
@@ -163,6 +174,7 @@
 			name = "RequirementsKitDemo-iOS";
 			packageProductDependencies = (
 				68BDFA2898201B81D5F98BE7 /* RequirementsKit */,
+				200221DC2F0A322B000C726F /* RequirementsKit */,
 			);
 			productName = "RequirementsKitDemo-iOS";
 			productReference = F338705BA1EFFA1F8E671DF6 /* RequirementsKitDemo-iOS.app */;
@@ -188,9 +200,8 @@
 			mainGroup = E57304473B3E090832BB9DA6;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				F4AF250632B8062E027B3766 /* XCLocalSwiftPackageReference "../..//" */,
+				200221DB2F0A322B000C726F /* XCLocalSwiftPackageReference "../../../requirements-kit" */,
 			);
-			preferredProjectObjectVersion = 77;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -219,10 +230,13 @@
 				E8002D03CDDAB8567EF25D80 /* AuthDemoView.swift in Sources */,
 				37301D8DF1B8717ADDC1D63A /* AuthRequirements.swift in Sources */,
 				D22A2D8806C402AA7D67A5CA /* ContentView.swift in Sources */,
+				8793889B5C01A3A1886EBC4C /* DecisionDemoView.swift in Sources */,
+				3B7F869B0EF096649E012869 /* DecisionExamples.swift in Sources */,
 				1AC93BFCE0647A206BD4D458 /* MacrosDemoView.swift in Sources */,
 				B784B248632F582F8905CBC0 /* MockServices.swift in Sources */,
 				DA96B3B3FD1650DE80E8058E /* Order.swift in Sources */,
 				D596AEC62338EC8CB0006510 /* Product.swift in Sources */,
+				D1A2BA9902C57CFCFECB0C95 /* RateLimitingExamples.swift in Sources */,
 				394604F4E8E94AF2F7CC7401 /* SubscriptionDemoView.swift in Sources */,
 				65582662DA560BBA3826DB4D /* SubscriptionRequirements.swift in Sources */,
 				151CD65C5929A824BEF1927F /* TradingDemoView.swift in Sources */,
@@ -361,6 +375,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = Z63N6YVL6T;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = "RequirementsKitDemo-iOS/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -381,6 +396,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = Z63N6YVL6T;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = "RequirementsKitDemo-iOS/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -420,13 +436,17 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		F4AF250632B8062E027B3766 /* XCLocalSwiftPackageReference "../..//" */ = {
+		200221DB2F0A322B000C726F /* XCLocalSwiftPackageReference "../../../requirements-kit" */ = {
 			isa = XCLocalSwiftPackageReference;
-			relativePath = "../..//";
+			relativePath = "../../../requirements-kit";
 		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		200221DC2F0A322B000C726F /* RequirementsKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = RequirementsKit;
+		};
 		68BDFA2898201B81D5F98BE7 /* RequirementsKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = RequirementsKit;

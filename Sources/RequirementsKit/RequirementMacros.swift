@@ -375,3 +375,429 @@ public macro requireBetween<Context: Sendable, Value: Comparable & Sendable>(
 @attached(member, names: named(validate))
 public macro RequirementModel() = #externalMacro(module: "RequirementsKitMacros", type: "RequirementModelMacro")
 
+// MARK: - Decision макросы
+
+/// Макрос для создания решений на основе контекста
+///
+/// Использование:
+/// ```swift
+/// let routeDecision = #decide { ctx in
+///   if ctx.isAuthenticated { return .dashboard }
+///   if ctx.hasSession { return .login }
+///   return .welcome
+/// }
+/// ```
+@freestanding(expression)
+public macro decide<Context: Sendable, Result: Sendable>(
+  _ decider: @escaping @Sendable (Context) -> Result?
+) -> Decision<Context, Result> = #externalMacro(module: "RequirementsKitMacros", type: "DecideMacro")
+
+/// Макрос для создания асинхронных решений на основе контекста
+///
+/// Использование:
+/// ```swift
+/// let routeDecision = #asyncDecide { ctx in
+///   let user = try await userService.fetch(ctx.userId)
+///   if user.isPremium { return .premiumDashboard }
+///   return .standardDashboard
+/// }
+/// ```
+@freestanding(expression)
+public macro asyncDecide<Context: Sendable, Result: Sendable>(
+  _ decider: @escaping @Sendable (Context) async throws -> Result?
+) -> AsyncDecision<Context, Result> = #externalMacro(module: "RequirementsKitMacros", type: "AsyncDecideMacro")
+
+/// Attached макрос для property wrapper, который автоматически принимает решение
+///
+/// Использование:
+/// ```swift
+/// @Decided(decision: routeDecision, context: requestContext)
+/// var currentRoute: Route
+/// ```
+@attached(accessor)
+public macro Decided<Context: Sendable, Result: Sendable>(
+  decision: Decision<Context, Result>,
+  context: Context
+) = #externalMacro(module: "RequirementsKitMacros", type: "DecidedMacro")
+
+// MARK: - Decision KeyPath макросы
+
+/// Макрос для создания условного решения на основе Bool KeyPath
+///
+/// Использование:
+/// ```swift
+/// #whenDecision(\.user.isAdmin, return: .adminPanel)
+/// ```
+@freestanding(expression)
+public macro whenDecision<Context: Sendable, Result: Sendable>(
+  _ keyPath: KeyPath<Context, Bool> & Sendable,
+  return value: Result
+) -> Decision<Context, Result> = #externalMacro(module: "RequirementsKitMacros", type: "WhenDecisionMacro")
+
+/// Макрос для создания условного решения на основе Bool KeyPath с замыканием
+///
+/// Использование:
+/// ```swift
+/// #whenDecision(\.user.isAdmin) { context in
+///   return .adminPanel
+/// }
+/// ```
+@freestanding(expression)
+public macro whenDecision<Context: Sendable, Result: Sendable>(
+  _ keyPath: KeyPath<Context, Bool> & Sendable,
+  @DecisionsBuilder<Context, Result> _ valueBuilder: () -> Decision<Context, Result>
+) -> Decision<Context, Result> = #externalMacro(module: "RequirementsKitMacros", type: "WhenDecisionMacro")
+
+/// Макрос для создания условного решения с проверкой равенства
+///
+/// Использование:
+/// ```swift
+/// #whenDecision(\.user.role, equals: .admin, return: .adminPanel)
+/// ```
+@freestanding(expression)
+public macro whenDecision<Context: Sendable, Value: Equatable & Sendable, Result: Sendable>(
+  _ keyPath: KeyPath<Context, Value> & Sendable,
+  equals expectedValue: Value,
+  return value: Result
+) -> Decision<Context, Result> = #externalMacro(module: "RequirementsKitMacros", type: "WhenDecisionMacro")
+
+/// Макрос для создания условного решения с проверкой неравенства
+///
+/// Использование:
+/// ```swift
+/// #whenDecision(\.user.status, notEquals: .banned, return: .dashboard)
+/// ```
+@freestanding(expression)
+public macro whenDecision<Context: Sendable, Value: Equatable & Sendable, Result: Sendable>(
+  _ keyPath: KeyPath<Context, Value> & Sendable,
+  notEquals expectedValue: Value,
+  return value: Result
+) -> Decision<Context, Result> = #externalMacro(module: "RequirementsKitMacros", type: "WhenDecisionMacro")
+
+/// Макрос для создания условного решения с проверкой "больше чем"
+///
+/// Использование:
+/// ```swift
+/// #whenDecision(\.user.balance, greaterThan: 1000, return: .premiumFeature)
+/// ```
+@freestanding(expression)
+public macro whenDecision<Context: Sendable, Value: Comparable & Sendable, Result: Sendable>(
+  _ keyPath: KeyPath<Context, Value> & Sendable,
+  greaterThan threshold: Value,
+  return value: Result
+) -> Decision<Context, Result> = #externalMacro(module: "RequirementsKitMacros", type: "WhenDecisionMacro")
+
+/// Макрос для создания условного решения с проверкой "больше или равно"
+///
+/// Использование:
+/// ```swift
+/// #whenDecision(\.user.level, greaterThanOrEqual: 10, return: .advancedMode)
+/// ```
+@freestanding(expression)
+public macro whenDecision<Context: Sendable, Value: Comparable & Sendable, Result: Sendable>(
+  _ keyPath: KeyPath<Context, Value> & Sendable,
+  greaterThanOrEqual threshold: Value,
+  return value: Result
+) -> Decision<Context, Result> = #externalMacro(module: "RequirementsKitMacros", type: "WhenDecisionMacro")
+
+/// Макрос для создания условного решения с проверкой "меньше чем"
+///
+/// Использование:
+/// ```swift
+/// #whenDecision(\.user.age, lessThan: 18, return: .restrictedMode)
+/// ```
+@freestanding(expression)
+public macro whenDecision<Context: Sendable, Value: Comparable & Sendable, Result: Sendable>(
+  _ keyPath: KeyPath<Context, Value> & Sendable,
+  lessThan threshold: Value,
+  return value: Result
+) -> Decision<Context, Result> = #externalMacro(module: "RequirementsKitMacros", type: "WhenDecisionMacro")
+
+/// Макрос для создания условного решения с проверкой "меньше или равно"
+///
+/// Использование:
+/// ```swift
+/// #whenDecision(\.stock.quantity, lessThanOrEqual: 0, return: .outOfStock)
+/// ```
+@freestanding(expression)
+public macro whenDecision<Context: Sendable, Value: Comparable & Sendable, Result: Sendable>(
+  _ keyPath: KeyPath<Context, Value> & Sendable,
+  lessThanOrEqual threshold: Value,
+  return value: Result
+) -> Decision<Context, Result> = #externalMacro(module: "RequirementsKitMacros", type: "WhenDecisionMacro")
+
+/// Макрос для создания условного решения с отрицанием (unless)
+///
+/// Использование:
+/// ```swift
+/// #unlessDecision(\.user.isBanned, return: .accessGranted)
+/// ```
+@freestanding(expression)
+public macro unlessDecision<Context: Sendable, Result: Sendable>(
+  _ keyPath: KeyPath<Context, Bool> & Sendable,
+  return value: Result
+) -> Decision<Context, Result> = #externalMacro(module: "RequirementsKitMacros", type: "UnlessDecisionMacro")
+
+// MARK: - Decision композиционные макросы
+
+/// Макрос для создания решения из нескольких вариантов (возвращает первое совпадение)
+///
+/// Использование:
+/// ```swift
+/// let route = #firstMatch {
+///   #whenDecision(\.user.isAdmin, return: .adminPanel)
+///   #whenDecision(\.user.isPremium, return: .premiumDashboard)
+///   #whenDecision(\.user.isLoggedIn, return: .dashboard)
+/// }
+/// ```
+@freestanding(expression)
+public macro firstMatch<Context: Sendable, Result: Sendable>(
+  @DecisionsBuilder<Context, Result> _ builder: () -> Decision<Context, Result>
+) -> Decision<Context, Result> = #externalMacro(module: "RequirementsKitMacros", type: "FirstMatchMacro")
+
+/// Макрос для создания switch-подобного решения на основе KeyPath
+///
+/// Использование:
+/// ```swift
+/// #matchDecision(\.user.role) {
+///   (.admin, .adminPanel)
+///   (.user, .userDashboard)
+///   (.guest, .guestView)
+/// }
+/// ```
+@freestanding(expression)
+public macro matchDecision<Context: Sendable, Key: Equatable & Hashable & Sendable, Result: Sendable>(
+  _ keyPath: KeyPath<Context, Key> & Sendable,
+  @MatchCasesBuilder<Context, Key, Result> casesBuilder: () -> [(Key, Decision<Context, Result>)]
+) -> Decision<Context, Result> = #externalMacro(module: "RequirementsKitMacros", type: "MatchDecisionMacro")
+
+/// Макрос для fallback значения по умолчанию
+///
+/// Использование:
+/// ```swift
+/// let decision = someDecision.#orElse(.defaultValue)
+/// // или в firstMatch:
+/// #firstMatch {
+///   #whenDecision(\.condition, return: .value)
+///   #orElse(.defaultValue)
+/// }
+/// ```
+@freestanding(expression)
+public macro orElse<Context: Sendable, Result: Sendable>(
+  _ defaultValue: Result
+) -> Decision<Context, Result> = #externalMacro(module: "RequirementsKitMacros", type: "OrElseMacro")
+
+// MARK: - Decision интеграция с Requirement
+
+/// Макрос для создания решения на основе требования
+///
+/// Использование:
+/// ```swift
+/// #whenMet(#require(\.user.isVIP), return: 0.2)
+/// ```
+@freestanding(expression)
+public macro whenMet<Context: Sendable, Result: Sendable>(
+  _ requirement: Requirement<Context>,
+  return value: Result
+) -> Decision<Context, Result> = #externalMacro(module: "RequirementsKitMacros", type: "WhenMetMacro")
+
+/// Макрос для создания решения на основе требования с замыканием
+///
+/// Использование:
+/// ```swift
+/// #whenMet(#require(\.user.isVIP)) { context in
+///   return context.calculateVIPDiscount()
+/// }
+/// ```
+@freestanding(expression)
+public macro whenMet<Context: Sendable, Result: Sendable>(
+  _ requirement: Requirement<Context>,
+  _ valueBuilder: @escaping @Sendable (Context) -> Result
+) -> Decision<Context, Result> = #externalMacro(module: "RequirementsKitMacros", type: "WhenMetMacro")
+
+// MARK: - Async Decision KeyPath макросы
+
+/// Макрос для создания асинхронного условного решения на основе Bool KeyPath
+///
+/// Использование:
+/// ```swift
+/// #asyncWhenDecision(\.user.isAdmin, return: .adminPanel)
+/// ```
+@freestanding(expression)
+public macro asyncWhenDecision<Context: Sendable, Result: Sendable>(
+  _ keyPath: KeyPath<Context, Bool> & Sendable,
+  return value: Result
+) -> AsyncDecision<Context, Result> = #externalMacro(module: "RequirementsKitMacros", type: "AsyncWhenDecisionMacro")
+
+/// Макрос для создания асинхронного условного решения с проверкой равенства
+///
+/// Использование:
+/// ```swift
+/// #asyncWhenDecision(\.user.role, equals: .admin, return: .adminPanel)
+/// ```
+@freestanding(expression)
+public macro asyncWhenDecision<Context: Sendable, Value: Equatable & Sendable, Result: Sendable>(
+  _ keyPath: KeyPath<Context, Value> & Sendable,
+  equals expectedValue: Value,
+  return value: Result
+) -> AsyncDecision<Context, Result> = #externalMacro(module: "RequirementsKitMacros", type: "AsyncWhenDecisionMacro")
+
+/// Макрос для создания асинхронного условного решения с проверкой неравенства
+///
+/// Использование:
+/// ```swift
+/// #asyncWhenDecision(\.user.status, notEquals: .banned, return: .dashboard)
+/// ```
+@freestanding(expression)
+public macro asyncWhenDecision<Context: Sendable, Value: Equatable & Sendable, Result: Sendable>(
+  _ keyPath: KeyPath<Context, Value> & Sendable,
+  notEquals expectedValue: Value,
+  return value: Result
+) -> AsyncDecision<Context, Result> = #externalMacro(module: "RequirementsKitMacros", type: "AsyncWhenDecisionMacro")
+
+/// Макрос для создания асинхронного условного решения с проверкой "больше чем"
+///
+/// Использование:
+/// ```swift
+/// #asyncWhenDecision(\.user.balance, greaterThan: 1000, return: .premiumFeature)
+/// ```
+@freestanding(expression)
+public macro asyncWhenDecision<Context: Sendable, Value: Comparable & Sendable, Result: Sendable>(
+  _ keyPath: KeyPath<Context, Value> & Sendable,
+  greaterThan threshold: Value,
+  return value: Result
+) -> AsyncDecision<Context, Result> = #externalMacro(module: "RequirementsKitMacros", type: "AsyncWhenDecisionMacro")
+
+/// Макрос для создания асинхронного условного решения с проверкой "больше или равно"
+///
+/// Использование:
+/// ```swift
+/// #asyncWhenDecision(\.user.level, greaterThanOrEqual: 10, return: .advancedMode)
+/// ```
+@freestanding(expression)
+public macro asyncWhenDecision<Context: Sendable, Value: Comparable & Sendable, Result: Sendable>(
+  _ keyPath: KeyPath<Context, Value> & Sendable,
+  greaterThanOrEqual threshold: Value,
+  return value: Result
+) -> AsyncDecision<Context, Result> = #externalMacro(module: "RequirementsKitMacros", type: "AsyncWhenDecisionMacro")
+
+/// Макрос для создания асинхронного условного решения с проверкой "меньше чем"
+///
+/// Использование:
+/// ```swift
+/// #asyncWhenDecision(\.user.age, lessThan: 18, return: .restrictedMode)
+/// ```
+@freestanding(expression)
+public macro asyncWhenDecision<Context: Sendable, Value: Comparable & Sendable, Result: Sendable>(
+  _ keyPath: KeyPath<Context, Value> & Sendable,
+  lessThan threshold: Value,
+  return value: Result
+) -> AsyncDecision<Context, Result> = #externalMacro(module: "RequirementsKitMacros", type: "AsyncWhenDecisionMacro")
+
+/// Макрос для создания асинхронного условного решения с проверкой "меньше или равно"
+///
+/// Использование:
+/// ```swift
+/// #asyncWhenDecision(\.stock.quantity, lessThanOrEqual: 0, return: .outOfStock)
+/// ```
+@freestanding(expression)
+public macro asyncWhenDecision<Context: Sendable, Value: Comparable & Sendable, Result: Sendable>(
+  _ keyPath: KeyPath<Context, Value> & Sendable,
+  lessThanOrEqual threshold: Value,
+  return value: Result
+) -> AsyncDecision<Context, Result> = #externalMacro(module: "RequirementsKitMacros", type: "AsyncWhenDecisionMacro")
+
+/// Макрос для создания асинхронного условного решения с отрицанием (unless)
+///
+/// Использование:
+/// ```swift
+/// #asyncUnlessDecision(\.user.isBanned, return: .accessGranted)
+/// ```
+@freestanding(expression)
+public macro asyncUnlessDecision<Context: Sendable, Result: Sendable>(
+  _ keyPath: KeyPath<Context, Bool> & Sendable,
+  return value: Result
+) -> AsyncDecision<Context, Result> = #externalMacro(module: "RequirementsKitMacros", type: "AsyncUnlessDecisionMacro")
+
+// MARK: - Async Decision композиционные макросы
+
+/// Макрос для создания асинхронного решения из нескольких вариантов (возвращает первое совпадение)
+///
+/// Использование:
+/// ```swift
+/// let route = #asyncFirstMatch {
+///   #asyncWhenDecision(\.user.isAdmin, return: .adminPanel)
+///   #asyncWhenDecision(\.user.isPremium, return: .premiumDashboard)
+/// }
+/// ```
+@freestanding(expression)
+public macro asyncFirstMatch<Context: Sendable, Result: Sendable>(
+  @AsyncDecisionsBuilder<Context, Result> _ builder: () -> AsyncDecision<Context, Result>
+) -> AsyncDecision<Context, Result> = #externalMacro(module: "RequirementsKitMacros", type: "AsyncFirstMatchMacro")
+
+/// Макрос для создания асинхронного switch-подобного решения на основе KeyPath
+///
+/// Использование:
+/// ```swift
+/// #asyncMatchDecision(\.user.role) {
+///   (.admin, .adminPanel)
+///   (.user, .userDashboard)
+/// }
+/// ```
+@freestanding(expression)
+public macro asyncMatchDecision<Context: Sendable, Key: Equatable & Hashable & Sendable, Result: Sendable>(
+  _ keyPath: KeyPath<Context, Key> & Sendable,
+  @AsyncMatchCasesBuilder<Context, Key, Result> casesBuilder: () -> [(Key, AsyncDecision<Context, Result>)]
+) -> AsyncDecision<Context, Result> = #externalMacro(module: "RequirementsKitMacros", type: "AsyncMatchDecisionMacro")
+
+/// Макрос для асинхронного fallback значения по умолчанию
+///
+/// Использование:
+/// ```swift
+/// #asyncOrElse(.defaultValue)
+/// ```
+@freestanding(expression)
+public macro asyncOrElse<Context: Sendable, Result: Sendable>(
+  _ defaultValue: Result
+) -> AsyncDecision<Context, Result> = #externalMacro(module: "RequirementsKitMacros", type: "AsyncOrElseMacro")
+
+// MARK: - Async Decision интеграция с Requirement
+
+/// Макрос для создания асинхронного решения на основе требования
+///
+/// Использование:
+/// ```swift
+/// #asyncWhenMet(#require(\.user.isVIP), return: 0.2)
+/// ```
+@freestanding(expression)
+public macro asyncWhenMet<Context: Sendable, Result: Sendable>(
+  _ requirement: Requirement<Context>,
+  return value: Result
+) -> AsyncDecision<Context, Result> = #externalMacro(module: "RequirementsKitMacros", type: "AsyncWhenMetMacro")
+
+/// Макрос для создания асинхронного решения на основе требования с замыканием
+///
+/// Использование:
+/// ```swift
+/// #asyncWhenMet(#require(\.user.isVIP)) { context in
+///   return await context.calculateVIPDiscount()
+/// }
+/// ```
+@freestanding(expression)
+public macro asyncWhenMet<Context: Sendable, Result: Sendable>(
+  _ requirement: Requirement<Context>,
+  _ valueBuilder: @escaping @Sendable (Context) async -> Result
+) -> AsyncDecision<Context, Result> = #externalMacro(module: "RequirementsKitMacros", type: "AsyncWhenMetMacro")
+
+/// Макрос для создания асинхронного решения на основе асинхронного требования
+///
+/// Использование:
+/// ```swift
+/// #asyncWhenMet(#asyncRequire { ctx in ... }, return: .value)
+/// ```
+@freestanding(expression)
+public macro asyncWhenMet<Context: Sendable, Result: Sendable>(
+  _ requirement: AsyncRequirement<Context>,
+  return value: Result
+) -> AsyncDecision<Context, Result> = #externalMacro(module: "RequirementsKitMacros", type: "AsyncWhenMetMacro")
+
